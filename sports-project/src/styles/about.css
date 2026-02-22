@@ -1,0 +1,59 @@
+/* Page wrapper */
+.pages {
+  min-height: 100vh;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Heading */
+.pages h2 {
+  font-size: 2.6rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Content container feel */
+.pages p {
+  max-width: 850px;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 22px;
+  color: #e5e7eb;
+}
+
+/* Highlighted text */
+.pages strong {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+/* Subtle card look on large screens */
+@media (min-width: 900px) {
+  .pages {
+    padding-top: 100px;
+  }
+
+  .pages p {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 18px 22px;
+    border-radius: 10px;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .pages h2 {
+    font-size: 2rem;
+  }
+
+  .pages p {
+    font-size: 0.95rem;
+  }
+}

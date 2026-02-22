@@ -1,0 +1,62 @@
+.product-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 35px 75px rgba(0, 0, 0, 0.6);
+}
+
+/* Product name */
+.product-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+/* Price */
+.product-card p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #93c5fd;
+  margin-bottom: 18px;
+}
+
+/* Button */
+.product-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+}
+
+.product-card button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 35px rgba(59, 130, 246, 0.6);
+}
+
+.product-card button:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.45);
+}
+
+/* Remove default link styling */
+.product-card a {
+  text-decoration: none;
+}

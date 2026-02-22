@@ -1,0 +1,174 @@
+/* Page wrapper */
+.payments-page {
+  min-height: 100vh;
+  padding: 70px 20px;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Box */
+.payment-box {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 30px 28px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  margin-top: 20px;
+}
+
+/* Title */
+.payments-page h2 {
+  position: absolute;
+  top: 75px;
+  color: #ffffff;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  
+}
+
+/* Section titles */
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+/* Inputs */
+.payment-box input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.payment-box input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Row */
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+/* Card button */
+.pay-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.45);
+}
+
+/* Divider */
+.divider {
+  text-align: center;
+  margin: 22px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  width: 40%;
+  background: #d1d5db;
+  position: absolute;
+  top: 50%;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+/* Wallet options */
+.wallet-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wallet {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ffffff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.wallet:hover {
+  transform: translateY(-2px);
+}
+
+/* Individual wallets */
+.wallet.amazon {
+  background: #ff9900;
+}
+
+.wallet.flipkart {
+  background: #2874f0;
+}
+
+.wallet.upi {
+  background: #10b981;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .payment-box {
+    padding: 24px 20px;
+  }
+
+  .payments-page h2 {
+    font-size: 1.8rem;
+  }
+}
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.back-button:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+}

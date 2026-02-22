@@ -1,0 +1,60 @@
+.navbar {
+  background: white;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar h2 {
+  font-weight: 800;
+  color: #111827;
+  margin-left: 15px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #374151;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #2563eb;
+}
+.account-logo-nav {
+  height: 34px;
+  cursor: pointer;
+  width: 40px;
+}
+
+.cart-link {
+  position: relative;
+  font-weight: 600;
+}
+
+/* Badge */
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -14px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 50%;
+  min-width: 18px;
+  text-align: center;
+  width: 20px;
+}
