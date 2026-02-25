@@ -5,16 +5,18 @@ import "../styles/navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
-  // 🔥 get cart from context
+  // 🔐 check login using token
+  const token = localStorage.getItem("token");
+
+  // 🛒 get cart from context
   const { cart } = useCart();
 
   // 🔢 total items count
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -38,8 +40,9 @@ const Navbar = () => {
           )}
         </Link>
 
-        {isLoggedIn ? (
+        {token ? (
           <>
+            {/* 👤 account logo */}
             <img
               src="/images/logo.png"
               alt="Account"
@@ -48,7 +51,7 @@ const Navbar = () => {
             />
 
             <span className="logout-btn" onClick={handleLogout}>
-              Logout
+              
             </span>
           </>
         ) : (

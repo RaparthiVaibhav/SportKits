@@ -134,3 +134,9 @@
 .auth p {
   text-align: center;
 }
+a.fpass {
+    font-size: 14px;
+    color: #cdcdcd;
+    text-align: center;
+    text-decoration: none;
+}

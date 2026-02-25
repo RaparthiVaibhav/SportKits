@@ -1,5 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
+import ForgotPassword from "./pages/ForgotPassword";
+
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
@@ -24,6 +26,7 @@ function App() {
       <main className="app-content">
         <Routes>
            <Route path="/login" element={<Login />} />
+           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />

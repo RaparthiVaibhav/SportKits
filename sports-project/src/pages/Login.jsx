@@ -1,28 +1,36 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
-    if (!user) {
-      alert("No user found. Please sign up first.");
-      navigate("/signup");
-      return;
-    }
+      alert("Login successful");
 
-    if (email === user.email && password === user.password) {
-      localStorage.setItem("isLoggedIn", "true");
+      // save token
+      localStorage.setItem("token", res.data.token);
+
       navigate("/account");
-    } else {
-      alert("Invalid credentials");
+
+    } catch (err) {
+      alert("Invalid email or password");
+      console.error(err);
     }
   };
 
@@ -37,6 +45,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -45,6 +54,7 @@ const Login = () => {
         />
 
         <button type="submit">Login</button>
+        <a className ="fpass" href="/forgot-password">Forgot password?</a>
       </form>
 
       <p>
