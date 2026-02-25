@@ -6,53 +6,51 @@ const CartContext = createContext(null);
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  const userId = "699d950b304ce3c3879820c5"; // your test user
+  // Replace later with logged-in user
+  const userId = "699d950b304ce3c3879820c5";
 
-  // Load cart from backend
   const fetchCart = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/cart/${userId}`
-      );
+      const res = await axios.get(`http://localhost:5000/api/cart/${userId}`);
 
-      setCart(res.data.cart?.items || []);
+      const items = res.data.cart?.items || [];
+
+    const formatted = items.map(item => ({
+  id: item.productId?._id,
+  name: item.productId?.name,
+  price: item.productId?.price,
+  image: item.productId?.image || "/images/default.jpg",
+  qty: item.quantity,
+}));
+
+      setCart(formatted);
     } catch (err) {
-      console.error("Error fetching cart:", err);
+      console.error("Fetch cart error:", err);
     }
   };
 
   useEffect(() => {
-  const loadCart = async () => {
-    try {
-      const res = await axios.get(
-        `http://localhost:5000/api/cart/${userId}`
-      );
-
-      setCart(res.data.cart?.items || []);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-    }
+  const load = async () => {
+    await fetchCart();
   };
 
-  loadCart();
+  load();
 }, []);
 
-  // Add item
   const addToCart = async (product, qty = 1) => {
     try {
       await axios.post("http://localhost:5000/api/cart/add", {
         userId,
-        productId: product._id || product.id,
+        productId: product._id,
         quantity: qty,
       });
 
-      await fetchCart();
+      fetchCart();
     } catch (err) {
-      console.error("Add to cart error:", err);
+      console.error("Add cart error:", err);
     }
   };
 
-  // Remove item
   const removeFromCart = async (productId) => {
     try {
       await axios.post("http://localhost:5000/api/cart/remove", {
@@ -60,28 +58,17 @@ export const CartProvider = ({ children }) => {
         productId,
       });
 
-      await fetchCart();
+      fetchCart();
     } catch (err) {
-      console.error("Remove error:", err);
+      console.error("Remove cart error:", err);
     }
   };
 
-  // Clear cart (optional later)
-  const clearCart = () => {};
-
   return (
-    <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart }}
-    >
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used inside CartProvider");
-  }
-  return context;
-};
+export const useCart = () => useContext(CartContext);

@@ -11,12 +11,13 @@ app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log("Mongo error:", err));
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log("Mongo error:", err));
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));
+app.use("/api/products", require("./routes/productRoutes"));
 
 // Test route
 app.get("/", (req, res) => {
