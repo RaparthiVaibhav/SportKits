@@ -1,42 +1,73 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 
 const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(() => {
-    const stored = localStorage.getItem("cart");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [cart, setCart] = useState([]);
 
-  // ✅ Save to localStorage
+  const userId = "699d950b304ce3c3879820c5"; // your test user
+
+  // Load cart from backend
+  const fetchCart = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/cart/${userId}`
+      );
+
+      setCart(res.data.cart?.items || []);
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+  const loadCart = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/cart/${userId}`
+      );
 
-  // 🔥 FIXED: Now accepts qty
-  const addToCart = (product, qty = 1) => {
-    setCart((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-
-      if (exists) {
-        // If product already exists → increase by selected qty
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, qty: item.qty + qty }
-            : item
-        );
-      }
-
-      // If new product → add with selected qty
-      return [...prev, { ...product, qty }];
-    });
+      setCart(res.data.cart?.items || []);
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+    }
   };
 
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  loadCart();
+}, []);
+
+  // Add item
+  const addToCart = async (product, qty = 1) => {
+    try {
+      await axios.post("http://localhost:5000/api/cart/add", {
+        userId,
+        productId: product._id || product.id,
+        quantity: qty,
+      });
+
+      await fetchCart();
+    } catch (err) {
+      console.error("Add to cart error:", err);
+    }
   };
 
-  const clearCart = () => setCart([]);
+  // Remove item
+  const removeFromCart = async (productId) => {
+    try {
+      await axios.post("http://localhost:5000/api/cart/remove", {
+        userId,
+        productId,
+      });
+
+      await fetchCart();
+    } catch (err) {
+      console.error("Remove error:", err);
+    }
+  };
+
+  // Clear cart (optional later)
+  const clearCart = () => {};
 
   return (
     <CartContext.Provider

@@ -10,15 +10,13 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect("mongodb://127.0.0.1:27017/sportkits", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB connected"))
 .catch(err => console.log("Mongo error:", err));
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/cart", require("./routes/cart"));
 
 // Test route
 app.get("/", (req, res) => {
