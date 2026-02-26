@@ -27,7 +27,7 @@ const Cart = () => {
     <div className="cart-page">
       {" "}
       <h2>Your Cart ({totalItems} items)</h2>
-      ```
+      
       {cart.map((item) => (
         <div key={item.id} className="cart-item">
           <img

@@ -26,7 +26,7 @@ const Login = () => {
       // save token
       localStorage.setItem("token", res.data.token);
 
-      navigate("/account");
+      navigate("/");
 
     } catch (err) {
       alert("Invalid email or password");
