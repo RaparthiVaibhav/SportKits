@@ -1,59 +1,49 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import "../styles/forgotpassword.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setMessage("");
-    setErrorMsg("");
-    setLoading(true);
-
+  const handleSendOtp = async () => {
     try {
       const res = await axios.post(
         "http://localhost:5000/api/auth/send-otp",
-        { email }
+        { email }  
       );
 
-      setMessage(res.data.message || "OTP sent to your email");
+      setMessage(res.data.message);
+
     } catch (error) {
-      setErrorMsg(
+      console.log(error.response?.data);
+      setMessage(
         error.response?.data?.message || "Failed to send OTP"
       );
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="forgot-wrapper">
-      <div className="forgot-card">
-        <h2>Forgot Password</h2>
-        <p>Enter your email to receive an OTP.</p>
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
+      <h2>Forgot Password</h2>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+      <input
+        type="email"
+        placeholder="Enter email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={{ padding: "10px", width: "300px" }}
+      />
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Sending OTP..." : "Send OTP"}
-          </button>
-        </form>
+      <br /><br />
 
-        {message && <p className="success">{message}</p>}
-        {errorMsg && <p className="error">{errorMsg}</p>}
-      </div>
+      <button
+        onClick={handleSendOtp}
+        style={{ padding: "10px 20px" }}
+      >
+        Send OTP
+      </button>
+
+      <p>{message}</p>
     </div>
   );
 };

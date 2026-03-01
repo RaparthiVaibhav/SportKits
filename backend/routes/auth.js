@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const User = require("../models/User");
-
+const sendEmail = require("../utils/sendEmail");
 
 
 // ================= SIGNUP =================
@@ -11,13 +11,19 @@ router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    if (!name || !email || !password)
+      return res.status(400).json({ message: "All fields are required" });
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "Email already registered" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     await user.save();
@@ -25,10 +31,9 @@ router.post("/signup", async (req, res) => {
     res.json({ message: "User registered successfully" });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 
 // ================= LOGIN =================
@@ -37,24 +42,25 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json("User not found");
+    if (!user)
+      return res.status(400).json({ message: "User not found" });
 
     const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass) return res.status(400).json("Invalid password");
+    if (!validPass)
+      return res.status(400).json({ message: "Invalid password" });
 
     const token = jwt.sign(
       { id: user._id },
-      "secretkey",
+      process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     res.json({ message: "Login successful", token });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 
 // ================= SEND OTP =================
@@ -62,29 +68,38 @@ router.post("/send-otp", async (req, res) => {
   try {
     const { email } = req.body;
 
+    if (!email)
+      return res.status(400).json({ message: "Email is required" });
+
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user)
+      return res.status(400).json({ message: "User not found" });
 
     const otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
       specialChars: false,
-      lowerCaseAlphabets: false
     });
 
     user.otp = otp;
     user.otpExpires = Date.now() + 10 * 60 * 1000;
+    user.isOtpVerified = false;
 
     await user.save();
 
-    console.log("OTP:", otp); // check terminal
+    await sendEmail(
+      email,
+      "Password Reset OTP - SportKits",
+      `Your OTP is ${otp}. It expires in 10 minutes.`
+    );
 
-    res.json({ message: "OTP sent (check terminal)" });
+    res.json({ message: "OTP sent successfully" });
 
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    console.log("SEND OTP ERROR:", error);
+    res.status(500).json({ message: "Failed to send OTP" });
   }
 });
-
 
 
 // ================= VERIFY OTP =================
@@ -100,13 +115,15 @@ router.post("/verify-otp", async (req, res) => {
     if (user.otpExpires < Date.now())
       return res.status(400).json({ message: "OTP expired" });
 
-    res.json({ message: "OTP verified" });
+    user.isOtpVerified = true;
+    await user.save();
+
+    res.json({ message: "OTP verified successfully" });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 
 // ================= RESET PASSWORD =================
@@ -116,20 +133,21 @@ router.post("/reset-password", async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    if (!user || !user.isOtpVerified)
+      return res.status(400).json({ message: "OTP not verified" });
 
+    user.password = await bcrypt.hash(password, 10);
     user.otp = null;
     user.otpExpires = null;
+    user.isOtpVerified = false;
 
     await user.save();
 
     res.json({ message: "Password reset successful" });
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 module.exports = router;

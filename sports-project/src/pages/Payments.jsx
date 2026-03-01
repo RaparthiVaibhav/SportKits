@@ -1,8 +1,53 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "../styles/payments.css";
 
 const Payments = () => {
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
+  const handlePayment = async (method) => {
+    try {
+      setLoading(true);
+
+      // Get cart from localStorage (make sure you're saving cart there)
+      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+      // Calculate total amount
+      const totalAmount = cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      );
+
+      const response = await fetch("http://localhost:5000/api/payment/pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          totalAmount: totalAmount,
+          paymentMethod: method,
+        }),
+      });
+
+      const data = await response.json();
+
+      alert(data.message);
+
+      // Clear cart after successful payment
+      localStorage.removeItem("cart");
+
+      navigate("/"); // redirect to home
+
+    } catch (error) {
+      alert("Payment Failed");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="payments-page">
@@ -30,25 +75,41 @@ const Payments = () => {
           <input type="text" placeholder="CVV" />
         </div>
 
-        <button className="pay-btn">
-          Pay with Card
+        <button
+          className="pay-btn"
+          onClick={() => handlePayment("Card")}
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Pay with Card"}
         </button>
 
         <div className="divider">OR</div>
 
-        {/* Wallet / Other Options */}
+        {/* Wallet Options */}
         <p className="section-title">🛍️ Pay Using</p>
 
         <div className="wallet-options">
-          <button className="wallet cod">
+          <button
+            className="wallet cod"
+            onClick={() => handlePayment("Cash On Delivery")}
+            disabled={loading}
+          >
             Cash on Delivery
           </button>
 
-          <button className="wallet phonepe">
+          <button
+            className="wallet phonepe"
+            onClick={() => handlePayment("PhonePe")}
+            disabled={loading}
+          >
             PhonePe
           </button>
 
-          <button className="wallet upi">
+          <button
+            className="wallet upi"
+            onClick={() => handlePayment("UPI")}
+            disabled={loading}
+          >
             UPI
           </button>
         </div>
