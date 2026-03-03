@@ -15,10 +15,10 @@ const Navbar = () => {
   // 🔢 total items count
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+ const handleLogout = () => {
+  localStorage.removeItem("token");
+  window.location.reload();   // 🔥 this resets entire React state
+};
 
   return (
     <nav className="navbar">
@@ -49,10 +49,9 @@ const Navbar = () => {
               className="account-logo-nav"
               onClick={() => navigate("/account")}
             />
-
-            <span className="logout-btn" onClick={handleLogout}>
-              
-            </span>
+<span className="logout-btn" onClick={handleLogout}>
+  Logout
+</span>
           </>
         ) : (
           <Link to="/login">Login</Link>

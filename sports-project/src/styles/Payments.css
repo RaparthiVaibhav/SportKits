@@ -125,6 +125,7 @@
   cursor: pointer;
   color: #ffffff;
   transition: transform 0.2s, box-shadow 0.2s;
+  background: #10b981;
 }
 
 .wallet:hover {

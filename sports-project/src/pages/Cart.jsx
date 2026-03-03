@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import "../styles/cart.css";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -8,54 +9,58 @@ const Cart = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please login to access cart");
-      navigate("/login");
-    }
+    if (!token) navigate("/login");
   }, [navigate]);
 
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.qty,
+    0
+  );
+
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="cart-page">
       <h2>Your Cart</h2>
 
-      {Array.isArray(cart) && cart.length === 0 && (
+      {cart.length === 0 ? (
         <p>No items in cart</p>
-      )}
+      ) : (
+        <>
+          {cart.map((item) => (
+            <div key={item.id} className="cart-item">
 
-      {Array.isArray(cart) &&
-        cart.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "15px",
-              borderBottom: "1px solid #ddd",
-              paddingBottom: "10px",
-            }}
-          >
-            <div>
-              <h4>{item.name}</h4>
-              <p>₹{item.price}</p>
-              <p>Quantity: {item.qty}</p>
+              <img
+                src={item.image}
+                alt={item.name}
+                className="cart-image"
+              />
+
+              <div className="cart-details">
+                <h4>{item.name}</h4>
+                <p>₹{item.price}</p>
+                <p>Qty: {item.qty}</p>
+                <p>Subtotal: ₹{item.price * item.qty}</p>
+              </div>
+
+              <button
+                className="remove-btn"
+                onClick={() => removeFromCart(item.id)}
+              >
+                Remove
+              </button>
             </div>
+          ))}
 
+          <div className="cart-summary">
+            <h3>Total: ₹{total}</h3>
             <button
-              onClick={() => removeFromCart(item.id)}
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                border: "none",
-                padding: "5px 10px",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
+              className="checkout-btn"
+              onClick={() => navigate("/checkout")}
             >
-              Remove
+              Checkout
             </button>
           </div>
-        ))}
+        </>
+      )}
     </div>
   );
 };

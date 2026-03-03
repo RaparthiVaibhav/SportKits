@@ -6,65 +6,110 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  const fetchCart = async () => {
-    const userId = localStorage.getItem("userId");
+  const getToken = () => localStorage.getItem("token");
 
-    if (!userId) {
+  // ================= FETCH CART =================
+  const fetchCart = async () => {
+    const token = getToken();
+
+    if (!token) {
       setCart([]);
       return;
     }
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/cart/${userId}`
+        "http://localhost:5000/api/cart",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ FIXED
+          },
+        }
       );
 
-      const items = res.data.cart?.items || [];
+      const items = res.data.items || [];
 
       const formatted = items.map((item) => ({
-        id: item.productId?._id,
-        name: item.productId?.name,
-        price: item.productId?.price,
+        id: item.product?._id,
+        name: item.product?.name,
+        price: item.product?.price,
+        image: item.product?.image || "/images/default.jpg",
         qty: item.quantity,
       }));
 
       setCart(formatted);
+
     } catch (err) {
-      console.error("Fetch cart error:", err);
+      console.error("Cart fetch error:", err);
       setCart([]);
     }
   };
 
+  // ================= LOAD CART ON LOGIN =================
   useEffect(() => {
     fetchCart();
+
+    const handleLogin = () => {
+      fetchCart();
+    };
+
+    window.addEventListener("login", handleLogin);
+
+    return () => {
+      window.removeEventListener("login", handleLogin);
+    };
   }, []);
 
-  const addToCart = async (product) => {
-    const userId = localStorage.getItem("userId");
+  // ================= ADD TO CART =================
+const addToCart = async (product, quantity = 1) => {
+  const token = getToken();
 
-    if (!userId) {
-      alert("Please login first");
-      return;
-    }
+  if (!token) {
+    alert("Please login first");
+    return;
+  }
 
-    await axios.post("http://localhost:5000/api/cart/add", {
-      userId,
-      productId: product._id,
-      quantity: 1,
-    });
+  try {
+    await axios.post(
+      "http://localhost:5000/api/cart",
+      {
+        product: product._id,
+        quantity: quantity,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     fetchCart();
-  };
 
+  } catch (err) {
+    console.error("Add to cart error:", err);
+  }
+};
+
+  // ================= REMOVE FROM CART =================
   const removeFromCart = async (productId) => {
-    const userId = localStorage.getItem("userId");
+    const token = getToken();
+    if (!token) return;
 
-    await axios.post("http://localhost:5000/api/cart/remove", {
-      userId,
-      productId,
-    });
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/cart/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ FIXED
+          },
+        }
+      );
 
-    fetchCart();
+      fetchCart();
+
+    } catch (err) {
+      console.error("Remove cart error:", err);
+    }
   };
 
   return (
