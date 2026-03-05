@@ -23,6 +23,10 @@ exports.addToCart = async (req, res) => {
   try {
     const { product, quantity } = req.body;
 
+    if (!product) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
     let cart = await Cart.findOne({ user: req.user._id });
 
     if (!cart) {
@@ -37,20 +41,23 @@ exports.addToCart = async (req, res) => {
     );
 
     if (existingItem) {
-      existingItem.quantity += quantity;
+      existingItem.quantity += Number(quantity);
     } else {
-      cart.items.push({ product, quantity });
+      cart.items.push({
+        product,
+        quantity: Number(quantity),
+      });
     }
 
     await cart.save();
 
     res.json(cart);
+
   } catch (err) {
+    console.error("AddToCart Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
-
-
 // ================= REMOVE FROM CART =================
 exports.removeFromCart = async (req, res) => {
   try {

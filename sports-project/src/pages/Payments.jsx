@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useCart } from "../context/CartContext";
 import "../styles/payments.css";
 
 const Payments = () => {
   const navigate = useNavigate();
+  const { cart } = useCart();
 
   const [loading, setLoading] = useState(false);
 
@@ -11,39 +13,53 @@ const Payments = () => {
     try {
       setLoading(true);
 
-      // Get cart from localStorage (make sure you're saving cart there)
-      const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+      const token = localStorage.getItem("token");
 
-      // Calculate total amount
-      const totalAmount = cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
+      if (!token) {
+        alert("Please login first");
+        navigate("/login");
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+
+      // Calculate total
+      const totalAmount = cart.reduce(
+        (total, item) => total + item.price * item.qty,
         0
       );
 
-      const response = await fetch("http://localhost:5000/api/payment/pay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: cartItems,
-          totalAmount: totalAmount,
-          paymentMethod: method,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/payment/pay",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            items: cart,
+            totalAmount,
+            paymentMethod: method,
+          }),
+        }
+      );
 
       const data = await response.json();
 
-      alert(data.message);
-
-      // Clear cart after successful payment
-      localStorage.removeItem("cart");
-
-      navigate("/"); // redirect to home
+      if (data.success) {
+        alert(data.message);
+        navigate("/order-success");
+      } else {
+        alert("Payment Failed");
+      }
 
     } catch (error) {
-      alert("Payment Failed");
       console.log(error);
+      alert("Payment Failed");
     } finally {
       setLoading(false);
     }
@@ -52,7 +68,6 @@ const Payments = () => {
   return (
     <div className="payments-page">
 
-      {/* 🔙 BACK BUTTON */}
       <button
         className="back-button"
         onClick={() => navigate(-1)}
@@ -64,7 +79,6 @@ const Payments = () => {
 
       <div className="payment-box">
 
-        {/* Card Payment */}
         <p className="section-title">💳 Card Details</p>
 
         <input type="text" placeholder="Card Holder Name" />
@@ -85,10 +99,10 @@ const Payments = () => {
 
         <div className="divider">OR</div>
 
-        {/* Wallet Options */}
         <p className="section-title">🛍️ Pay Using</p>
 
         <div className="wallet-options">
+
           <button
             className="wallet cod"
             onClick={() => handlePayment("Cash On Delivery")}
@@ -112,6 +126,7 @@ const Payments = () => {
           >
             UPI
           </button>
+
         </div>
 
       </div>

@@ -2,6 +2,7 @@ require("dotenv").config();
 
 console.log("JWT_SECRET VALUE:", process.env.JWT_SECRET);
 
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -18,6 +19,8 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/payment", require("./routes/payment"));
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running");

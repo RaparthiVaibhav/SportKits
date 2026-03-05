@@ -22,12 +22,13 @@ export const CartProvider = ({ children }) => {
         "http://localhost:5000/api/cart",
         {
           headers: {
-            Authorization: `Bearer ${token}`, // ✅ FIXED
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      const items = res.data.items || [];
+      // 🔥 FIX: Backend returns full cart object, not just items
+      const items = res.data?.items || [];
 
       const formatted = items.map((item) => ({
         id: item.product?._id,
@@ -45,7 +46,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // ================= LOAD CART ON LOGIN =================
+  // ================= LOAD CART =================
   useEffect(() => {
     fetchCart();
 
@@ -69,12 +70,17 @@ const addToCart = async (product, quantity = 1) => {
     return;
   }
 
+  if (!product?._id) {
+    console.error("Invalid product:", product);
+    return;
+  }
+
   try {
-    await axios.post(
+    const res = await axios.post(
       "http://localhost:5000/api/cart",
       {
         product: product._id,
-        quantity: quantity,
+        quantity: Number(quantity),
       },
       {
         headers: {
@@ -83,10 +89,12 @@ const addToCart = async (product, quantity = 1) => {
       }
     );
 
+    console.log("Cart updated:", res.data);
+
     fetchCart();
 
   } catch (err) {
-    console.error("Add to cart error:", err);
+    console.error("Add to cart error:", err.response?.data || err.message);
   }
 };
 
@@ -100,13 +108,12 @@ const addToCart = async (product, quantity = 1) => {
         `http://localhost:5000/api/cart/${productId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // ✅ FIXED
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      fetchCart();
-
+      fetchCart(); // 🔥 refresh after removing
     } catch (err) {
       console.error("Remove cart error:", err);
     }
